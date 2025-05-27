@@ -1,4 +1,4 @@
-# Kaan's Inventory Management Demo
+# Inventory Management Demo
 
 A full-stack inventory management app with authentication and image uploads
 
