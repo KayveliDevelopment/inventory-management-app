@@ -1,4 +1,6 @@
 const { Sequelize } = require("sequelize");
+const UserModel = require("./user");
+const InventoryItemModel = require("./inventoryItem");
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -7,15 +9,30 @@ const sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT || 5432,
-    dialect: 'postgres',
+    dialect: "postgres",
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false
-      }
-    }
+        rejectUnauthorized: false,
+      },
+    },
+    logging: false,
   }
 );
 
-// Export sequelize
-module.exports = { sequelize };
+// Initialize models
+const User = UserModel(sequelize);
+const InventoryItem = InventoryItemModel(sequelize);
+
+// Add associations if needed (optional)
+// Example: InventoryItem.belongsTo(User);
+
+sequelize.sync({ alter: true }) // Sync tables to DB
+  .then(() => console.log("Database synced!"))
+  .catch((err) => console.error("Sync error:", err));
+
+module.exports = {
+  sequelize,
+  User,
+  InventoryItem,
+};
