@@ -34,7 +34,7 @@ export default function Inventory() {
     }
 
     try {
-      const res = await axios.post("${import.meta.env.VITE_API_URL}/api/inventory", formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/inventory`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
