@@ -13,7 +13,7 @@ export default function Inventory() {
 
   const fetchInventory = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/inventory`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setItems(res.data);
