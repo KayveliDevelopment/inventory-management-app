@@ -11,13 +11,16 @@ export default function Inventory() {
   const [editForm, setEditForm] = useState({});
   const [error, setError] = useState(null);
 
+  const API = import.meta.env.VITE_API_URL;
+
   const fetchInventory = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/inventory`, {
+      const res = await axios.get(`${API}/api/inventory`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setItems(res.data);
     } catch (err) {
+      console.error("Fetch error:", err);
       setError("Failed to load inventory.");
     }
   };
@@ -29,12 +32,10 @@ export default function Inventory() {
     formData.append("quantity", form.quantity);
     formData.append("price", form.price);
     formData.append("description", form.description);
-    if (form.image) {
-      formData.append("image", form.image);
-    }
+    if (form.image) formData.append("image", form.image);
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/inventory`, formData, {
+      const res = await axios.post(`${API}/api/inventory`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -44,17 +45,19 @@ export default function Inventory() {
       setForm({ name: "", quantity: "", price: "", description: "", image: null });
       setPreviewUrl(null);
     } catch (err) {
+      console.error("Add error:", err);
       setError("Failed to add item.");
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/inventory/${id}`, {
+      await axios.delete(`${API}/api/inventory/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setItems((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
+      console.error("Delete error:", err);
       setError("Failed to delete item.");
     }
   };
@@ -70,19 +73,14 @@ export default function Inventory() {
 
   const handleSaveEdit = async () => {
     try {
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/inventory/${editingId}`,
-        editForm,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setItems((prev) =>
-        prev.map((item) => (item.id === editingId ? res.data : item))
-      );
+      const res = await axios.put(`${API}/api/inventory/${editingId}`, editForm, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setItems((prev) => prev.map((item) => (item.id === editingId ? res.data : item)));
       setEditingId(null);
       setEditForm({});
     } catch (err) {
+      console.error("Edit error:", err);
       setError("Failed to update item.");
     }
   };
@@ -159,7 +157,6 @@ export default function Inventory() {
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               className="border border-neutral-600 bg-neutral-900 text-white p-2 rounded col-span-2"
             />
-
             <div className="col-span-2">
               <label className="block text-sm font-medium mb-1">Upload Image</label>
               <div className="flex items-center gap-4">
@@ -173,24 +170,24 @@ export default function Inventory() {
                   />
                 </label>
                 {previewUrl && (
-            <div className="relative w-16 h-16">
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="w-full h-full object-cover rounded"
-              />
-           <button
-            type="button"
-            onClick={() => {
-            setPreviewUrl(null);
-            setForm((prev) => ({ ...prev, image: null }));
-          }}
-           className="absolute -top-2 -right-2 bg-neutral-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hover:bg-red-700"
-          title="Remove image"
-        >
-      ×
-    </button>
-  </div>
+                  <div className="relative w-16 h-16">
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      className="w-full h-full object-cover rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreviewUrl(null);
+                        setForm((prev) => ({ ...prev, image: null }));
+                      }}
+                      className="absolute -top-2 -left-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hover:bg-red-700"
+                      title="Remove image"
+                    >
+                      ×
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -208,10 +205,7 @@ export default function Inventory() {
         <ul className="space-y-4">
           {items.map((item) =>
             editingId === item.id ? (
-              <li
-                key={item.id}
-                className="bg-yellow-100 text-black p-4 rounded shadow space-y-2"
-              >
+              <li key={item.id} className="bg-yellow-100 text-black p-4 rounded shadow space-y-2">
                 <input
                   name="name"
                   value={editForm.name}
@@ -237,28 +231,19 @@ export default function Inventory() {
                   className="w-full border p-2 rounded"
                 />
                 <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={handleSaveEdit}
-                    className="bg-green-600 text-white px-4 py-1 rounded"
-                  >
+                  <button onClick={handleSaveEdit} className="bg-green-600 text-white px-4 py-1 rounded">
                     Save
                   </button>
-                  <button
-                    onClick={cancelEdit}
-                    className="bg-gray-400 text-white px-4 py-1 rounded"
-                  >
+                  <button onClick={cancelEdit} className="bg-gray-400 text-white px-4 py-1 rounded">
                     Cancel
                   </button>
                 </div>
               </li>
             ) : (
-              <li
-                key={item.id}
-                className="bg-neutral-800 p-4 rounded shadow flex gap-4 items-start"
-              >
+              <li key={item.id} className="bg-neutral-800 p-4 rounded shadow flex gap-4 items-start">
                 {item.imageUrl && (
                   <img
-                    src={`${import.meta.env.VITE_API_URL}${item.imageUrl}`}
+                    src={`${API}${item.imageUrl}`}
                     alt={item.name}
                     className="w-20 h-20 object-cover rounded"
                   />
@@ -271,16 +256,10 @@ export default function Inventory() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 justify-center">
-                  <button
-                    onClick={() => startEdit(item)}
-                    className="bg-yellow-500 text-white px-4 py-1 rounded"
-                  >
+                  <button onClick={() => startEdit(item)} className="bg-yellow-500 text-white px-4 py-1 rounded">
                     Edit
                   </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="bg-red-500 text-white px-4 py-1 rounded"
-                  >
+                  <button onClick={() => handleDelete(item.id)} className="bg-red-500 text-white px-4 py-1 rounded">
                     Delete
                   </button>
                 </div>
