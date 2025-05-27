@@ -12,7 +12,7 @@ export default function Register() {
     setError(null);
 
     try {
-      await axios.post("http://localhost:4000/api/auth/register", form);
+      await axios.post("${import.meta.env.VITE_API_URL}/api/auth/register", form);
       navigate("/login");
     } catch (err) {
       setError("Registration failed. Try a different username.");

@@ -13,7 +13,7 @@ export default function Inventory() {
 
   const fetchInventory = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/inventory", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setItems(res.data);
@@ -34,7 +34,7 @@ export default function Inventory() {
     }
 
     try {
-      const res = await axios.post("http://localhost:4000/api/inventory", formData, {
+      const res = await axios.post("${import.meta.env.VITE_API_URL}/api/inventory", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -50,7 +50,7 @@ export default function Inventory() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:4000/api/inventory/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/inventory/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setItems((prev) => prev.filter((item) => item.id !== id));
@@ -71,7 +71,7 @@ export default function Inventory() {
   const handleSaveEdit = async () => {
     try {
       const res = await axios.put(
-        `http://localhost:4000/api/inventory/${editingId}`,
+        `${import.meta.env.VITE_API_URL}/api/inventory/${editingId}`,
         editForm,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -258,7 +258,7 @@ export default function Inventory() {
               >
                 {item.imageUrl && (
                   <img
-                    src={`http://localhost:4000${item.imageUrl}`}
+                    src={`${import.meta.env.VITE_API_URL}${item.imageUrl}`}
                     alt={item.name}
                     className="w-20 h-20 object-cover rounded"
                   />
